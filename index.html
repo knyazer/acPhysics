@@ -1,0 +1,146 @@
+<html>
+<head>
+<meta charset='utf-8'/>
+<title>Physics</title>
+<style>
+  .field
+  {
+    position: relative;
+    left: 220px;
+    top: -20px;
+    margin-top:0px;
+    width: 300px;
+  }
+  #result {
+    position: absolute;
+    right: 40px;
+    top: -6px;
+    text-align:right;
+  }
+</style>
+</head>
+<body>
+
+  <div>Начальная скорость: <div class="field"><input type="text" id="1" oninput="update()" value="30">м/с</div></div>
+  <div>Начальный угол:     <div class="field"><input type="text" id="2" value="60" oninput="update()" >deg</div></div>
+  <div>Начальная высота:   <div class="field"><input type="text" id="6" value="0" oninput="update()" >м</div></div>
+  <div>Время:              <div class="field"><input type="text" id="5" value="0.5" oninput="update()" >с</div></div>
+  <div>Наклон вектора скорости: <div class="field"><input type="text" id="4" value="45" oninput="update()" >deg</div></div>
+  <div>Ускорение свободного падения:  <div class="field"><input type="text" id="3" value="10" oninput="update()" >м/с^2</div></div>
+  <div>Количество значащих цифр:  <div class="field"><input type="text" id="7" value="3" oninput="update()" ></div></div>
+
+  <div id="result">
+    <p id="a1"></p>
+    <p id="a2"></p>
+    <p id="a3"></p>
+    <p id="a4"></p>
+    <p id="a5"></p>
+    <p id="a6"></p>
+    <p id="a7"></p>
+    <p id="a8"></p>
+    <p id="a9"></p>
+    <p id="a10"></p>
+    <p id="a11"></p>
+    <p id="a12"></p>
+    <p id="a13"></p>
+    <p id="a14"></p>
+  </div>
+
+  <script>
+    function read(i)
+    {
+      return (document.getElementById(String(i)).value);
+    }
+
+    function update()
+    {
+      res = calculate(read(1), read(2), read(3), read(4), read(5), read(6), read(7));
+      document.getElementById("a1").innerHTML = "Координата по X через " + read(5) + "c: <b>" + res[0] + "м</b>";
+      document.getElementById("a2").innerHTML = "Координата по Y через " + read(5) + "c: <b>" + res[1] + "м</b>";
+      document.getElementById("a3").innerHTML = "Модуль скорости тела через " + read(5) + "c: <b>" + res[2] + "м/с</b>";
+      document.getElementById("a4").innerHTML = "Направление скорости тела через  " + read(5) + "c: <b>" + res[3] + "deg</b>";
+      document.getElementById("a5").innerHTML = "Нормальное ускорение через " + read(5) + "c: <b>" + res[4] + "м/c^2</b>";
+      document.getElementById("a6").innerHTML = "Тангенциальное ускорение через " + read(5) + "c: <b>" + res[5] + "м/c^2</b>";
+      document.getElementById("a7").innerHTML = "Радиус кривизны траектории через  " + read(5) + "c: <b>" + res[6] + "м</b>";
+      document.getElementById("a8").innerHTML = "Наибольшая высота: <b>" + res[7] + "м</b>";
+      document.getElementById("a9").innerHTML = "Дальность полета тела: <b>" + res[8] + "м</b>";
+      document.getElementById("a10").innerHTML = "Время подъема тела: <b>" + res[9] + "c</b>";
+      document.getElementById("a11").innerHTML = "Время полета тела: <b>" + res[10] + "c</b>";
+      document.getElementById("a12").innerHTML = "Радиус кривизны в начале движения:  <b>" + res[11] + "м</b>";
+      document.getElementById("a13").innerHTML = "Радиус кривизны в наивысшей точке: <b>" + res[12] + "м</b>";
+      document.getElementById("a14").innerHTML = "Совпадение вектора скорости с требуемым через: <b>" + res[13] + "с</b>";
+
+    }
+
+    function radians(x)
+    {
+      return x * Math.PI / 180;
+    }
+
+    function degrees(x)
+    {
+      return x * 180 / Math.PI;
+    }
+
+    function calculate(v, alpha, g, theta, t, h, digits)
+    {
+      let xAtT, yAtT, horVAtT, verVAtT, vAtT, dirOfVAtT, tangentAccAtT, normalAccAtT, T, maxHeight, wholeTime, wholeDisplacement, moveUpperTime, RAtMaxPoint, RAtBeginning, timeToTargetVelocity;
+
+      alpha = radians(alpha);
+      theta = radians(theta);
+
+      console.log(alpha, theta)
+
+      xAtT = v * Math.cos(alpha) * t;
+      yAtT = h + v * Math.sin(alpha) * t - g * (t ** 2) / 2;
+
+      horVAtT = v * Math.cos(alpha);
+      verVAtT = v * Math.sin(alpha) - g * t;
+      vAtT = Math.sqrt(horVAtT ** 2 + verVAtT ** 2);
+
+      dirOfVAtT = Math.atan2(verVAtT, horVAtT);
+
+      tangentAccAtT = Math.sin(dirOfVAtT) * g;
+      normalAccAtT = Math.cos(dirOfVAtT) * g;
+
+      R = (vAtT ** 2) / normalAccAtT;
+
+      maxHeight = (v ** 2) * (Math.sin(alpha) ** 2) / (2 * g);
+
+      wholeTime = (v * Math.sin(alpha) + Math.sqrt((v ** 2) * (Math.sin(alpha) ** 2) + 2 * g * h)) / g;
+      wholeDisplacement = wholeTime * v * Math.cos(alpha);
+
+      moveUpperTime = v * Math.sin(alpha) / g;
+
+      RAtMaxPoint = ((v * Math.cos(alpha)) ** 2) / g;
+      RAtBeginning = (v ** 2) / (g * Math.cos(alpha));
+
+      timeToTargetVelocity = v * (Math.sin(alpha) - Math.tan(theta) * Math.cos(alpha)) / g;
+
+      res = [xAtT, yAtT, vAtT, degrees(dirOfVAtT), normalAccAtT, tangentAccAtT, R, maxHeight, wholeDisplacement, moveUpperTime, wholeTime, RAtBeginning, RAtMaxPoint, timeToTargetVelocity]
+
+      for (var i = 0; i < res.length; i++)
+      {
+          x = res[i];
+
+          d = digits - Math.round(Math.log10(Math.max(x, 1e-6)));
+
+          if (d < 0)
+              d = 0;
+
+          if (d > 6)
+              d = 6;
+
+          if (d != 0)
+              res[i] = Math.round(x * (10 ** d)) / (10 ** d);
+          else
+              res[i] = Math.round(x);
+      }
+
+      return res;
+    }
+
+
+  </script>
+</body>
+</html>
